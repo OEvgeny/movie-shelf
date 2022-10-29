@@ -3,16 +3,8 @@
     <div flex="~ row gap2" items-center my2>
       <img src="/movies-sm.webp" width="25" height="25" alt="Logo">
       <div text-xl>
-        Nuxt Movies
+        Movie Shelf
       </div>
-    </div>
-    <div flex="~ row gap2" items-center>
-      <div op50 text-sm>
-        Made with
-      </div>
-      <a href="https://v3.nuxtjs.org/" target="_blank" title="Nuxt 3">
-        <IconNuxt3 h6 />
-      </a>
     </div>
     <div flex="~ row gap2" items-center>
       <p text-true-gray:90 text-sm>
@@ -30,14 +22,9 @@
     <div>
       <ExternalLinks
         :links="{
-          twitter_id: 'nuxt_js',
-          github_id: 'nuxt/movies',
+          github_id: 'OEvgeny/movie-shelf',
         }"
-      >
-        <a href="https://vercel.com" rel="noopener" target="_blank" aria-label="go to vercel">
-          <IconVercel alt="Vercel" />
-        </a>
-      </ExternalLinks>
+      />
     </div>
   </footer>
 </template>

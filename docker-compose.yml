@@ -1,0 +1,82 @@
+version: '3.3'
+
+services:
+  movie-shelf:
+    build:
+      context: .
+      args:
+        - NUXT_PUBLIC_PROXY_URL=https://proxy.movie-shelf.${DOMAIN}/
+    container_name: movie-shelf
+    restart: unless-stopped
+    environment:
+      - PGID=1001
+      - PUID=1000
+      - NUXT_PUBLIC_PROXY_URL=https://proxy.movie-shelf.${DOMAIN}/
+      - NUXT_PUBLIC_WORKER_URL=https://worker.movie-shelf.${DOMAIN}/
+      - NITRO_WORKER_PROXY_URL=https://proxy.movie-shelf.${DOMAIN}/
+      - NITRO_TMDB_API_KEY=
+      - NITRO_TMDB_LANG=ru-RU
+      - NITRO_PROWLARR_URL=
+      - NITRO_PROWLARR_API_KEY=
+      - NITRO_WORKER_REMOTE_FOLDER_URL=
+    volumes:
+      - '/opt/movie-shelf:/data'
+      - '/etc/localtime:/etc/localtime:ro'
+    expose:
+      - 3000/tcp
+      - 3001/tcp
+      - 3002/tcp
+    networks:
+      saltbox:
+        aliases:
+          - movie-shelf
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+    labels:
+      - com.github.saltbox.saltbox_managed=true
+      - traefik.enable=true
+      # app
+      - traefik.http.routers.movie-shelf-http.entrypoints=web
+      - traefik.http.routers.movie-shelf-http.middlewares=globalHeaders@file,redirect-to-https,gzip
+      - traefik.http.routers.movie-shelf-http.rule=Host(`movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf-http.service=movie-shelf
+      - traefik.http.services.movie-shelf-http.loadbalancer.server.port=3000
+      - traefik.http.routers.movie-shelf.entrypoints=websecure
+      - traefik.http.routers.movie-shelf.middlewares=globalHeaders@file,secureHeaders@file
+      - traefik.http.routers.movie-shelf.rule=Host(`movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf.service=movie-shelf
+      - traefik.http.routers.movie-shelf.tls.certresolver=httpresolver
+      - traefik.http.routers.movie-shelf.tls.options=securetls@file
+      - traefik.http.services.movie-shelf.loadbalancer.server.port=3000
+      # proxy
+      - traefik.http.routers.movie-shelf-proxy-http.entrypoints=web
+      - traefik.http.routers.movie-shelf-proxy-http.middlewares=globalHeaders@file,redirect-to-https,gzip
+      - traefik.http.routers.movie-shelf-proxy-http.rule=Host(`proxy.movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf-proxy-http.service=movie-shelf
+      - traefik.http.services.movie-shelf-proxy-http.loadbalancer.server.port=3001
+      - traefik.http.routers.movie-shelf-proxy.entrypoints=websecure
+      - traefik.http.routers.movie-shelf-proxy.middlewares=globalHeaders@file,secureHeaders@file
+      - traefik.http.routers.movie-shelf-proxy.rule=Host(`proxy.movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf-proxy.service=movie-shelf
+      - traefik.http.routers.movie-shelf-proxy.tls.certresolver=httpresolver
+      - traefik.http.routers.movie-shelf-proxy.tls.options=securetls@file
+      - traefik.http.services.movie-shelf-proxy.loadbalancer.server.port=3001
+      # worker
+      - traefik.http.routers.movie-shelf-worker-http.entrypoints=web
+      - traefik.http.routers.movie-shelf-worker-http.middlewares=globalHeaders@file,redirect-to-https,gzip
+      - traefik.http.routers.movie-shelf-worker-http.rule=Host(`worker.movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf-worker-http.service=movie-shelf
+      - traefik.http.services.movie-shelf-worker-http.loadbalancer.server.port=3002
+      - traefik.http.routers.movie-shelf-worker.entrypoints=websecure
+      - traefik.http.routers.movie-shelf-worker.middlewares=globalHeaders@file,secureHeaders@file
+      - traefik.http.routers.movie-shelf-worker.rule=Host(`worker.movie-shelf.${DOMAIN}`)
+      - traefik.http.routers.movie-shelf-worker.service=movie-shelf
+      - traefik.http.routers.movie-shelf-worker.tls.certresolver=httpresolver
+      - traefik.http.routers.movie-shelf-worker.tls.options=securetls@file
+      - traefik.http.services.movie-shelf-worker.loadbalancer.server.port=3002
+
+networks:
+  saltbox:
+    external: true

@@ -1,7 +1,9 @@
-node_modules
 *.log
+node_modules
 dist
+data
 .output
 .nuxt
-.env
 .nitro
+.env*
+!.env.example

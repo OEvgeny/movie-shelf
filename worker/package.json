@@ -1,0 +1,16 @@
+{
+  "private": true,
+  "scripts": {
+    "dev": "PORT=3002 nitropack dev",
+    "build": "nitropack build"
+  },
+  "devDependencies": {
+    "nitropack": "^0.6.0",
+    "ohmyfetch": "^0.4.19",
+    "parse-apache-directory-index": "^3.0.2",
+    "typescript": "^4.8.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
+  }
+}

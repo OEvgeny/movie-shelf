@@ -6,7 +6,7 @@ defineProps<{
   type: MediaType
 }>()
 
-const tab = $ref<'overview' | 'videos' | 'photos'>('overview')
+const tab = $ref<'overview' | 'videos' | 'photos' | 'search'>('overview')
 </script>
 
 <template>
@@ -20,8 +20,12 @@ const tab = $ref<'overview' | 'videos' | 'photos'>('overview')
     <button n-tab :class="{ 'n-tab-active': tab === 'photos' }" @click="tab = 'photos'">
       Photos
     </button>
+    <button n-tab :class="{ 'n-tab-active': tab === 'search' }" @click="tab = 'search'">
+      Search
+    </button>
   </div>
   <MediaOverview v-if="tab === 'overview'" :item="item" :type="type" />
   <MediaVideos v-if="tab === 'videos'" :item="item" />
   <MediaPhotos v-if="tab === 'photos'" :item="item" />
+  <MediaSearch v-if="tab === 'search'" :query="item.title ?? item.name" />
 </template>

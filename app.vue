@@ -1,6 +1,8 @@
 <script setup>
 import '@unocss/reset/tailwind.css'
 
+setConfig(useRuntimeConfig())
+
 useHead({
   htmlAttrs: {
     lang: 'en',

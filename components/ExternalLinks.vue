@@ -2,6 +2,7 @@
 import type { ExternalIds } from '~/types'
 
 defineProps<{
+  type?: string,
   links: ExternalIds
 }>()
 </script>
@@ -40,7 +41,7 @@ defineProps<{
     </a>
     <a
       v-if="links.imdb_id"
-      :href="`https://www.imdb.com/movie/${links.imdb_id}`"
+      :href="`https://www.imdb.com/${['movie', 'tv'].includes(type) ? 'title' : 'name'}/${links.imdb_id}`"
       target="_blank"
       aria-label="Link to IMDb account"
       rel="noopener"

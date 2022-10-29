@@ -53,12 +53,15 @@ else {
       {{ count }} items
     </div>
     <MediaGrid>
-      <MediaCard
-        v-for="item of items"
-        :key="item.id"
-        :type="type"
-        :item="item"
-      />
+      <template v-for="item of items">
+        <slot name="item" v-bind="{ item }">
+          <MediaCard
+            :key="item.id"
+            :type="type"
+            :item="item"
+          />
+        </slot>
+      </template>
     </MediaGrid>
     <div ref="tailEl" />
     <div v-if="isLoading" p10 animate-pulse>

@@ -7,6 +7,9 @@ const { item } = defineProps<{
 
 const showModal = useIframeModal()
 const play = () => showModal(getVideoLink(item)!)
+
+const hideImg = ref(false)
+
 </script>
 
 <template>
@@ -18,11 +21,13 @@ const play = () => showModal(getVideoLink(item)!)
       hover="scale-102 z10"
     >
       <NuxtImg
+        v-show="!hideImg"
         :src="`/youtube/vi/${item.key}/maxresdefault.jpg`"
         width="400"
         height="600"
         format="webp"
         :alt="item.name"
+        @error="hideImg = true"
         w-full h-full object-cover
       />
       <div flex w-full h-full absolute inset-0 op20 hover:op100 transition>

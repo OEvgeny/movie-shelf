@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Media } from '~/types'
-import { TMDB_IMAGE_BASE_ORIGINAL } from '~/constants/images'
+import type { Media, MediaType } from '~/types'
 import { formatTime } from '~/composables/utils'
 
-const { item } = defineProps<{
-  item: Media
+const { item, type = item?.media_type } = defineProps<{
+  item: Media,
+  type?: MediaType
 }>()
 
 const trailer = $computed(() => getTrailer(item))
@@ -16,6 +16,12 @@ function playTrailer() {
 }
 
 const mounted = useMounted()
+
+const files = computed(() => getFiles(type, item.id))
+const filesRoot = computed(() => getFilesRoot(type, item.id))
+
+const openImportModal = useImportModal()
+
 </script>
 
 <template>
@@ -64,16 +70,38 @@ const mounted = useMounted()
           <p mt-2 op80 leading-relaxed of-hidden line-clamp-3 md:line-clamp-5 text-xs md:text-base>
             {{ item.overview }}
           </p>
-          <div v-if="trailer" py5 display-none lg:block>
-            <button
-              flex="~ gap2" items-center p="x6 y3"
-              bg="gray/15 hover:gray/20" transition
-              title="Watch Trailer"
-              @click="playTrailer()"
-            >
-              <div i-ph-play />
-              Watch Trailer
-            </button>
+          <div flex="~ gap2" py5>
+            <div v-if="files" flex gap2>
+              <button
+                flex="~ gap2" items-center p="x6 y3"
+                bg="lime/70 hover:lime/75" transition
+                title="Watch"
+                @click="downloadM3U(item, files)"
+              >
+                <div i-ph-play />
+                Watch
+              </button>
+              <button
+                order-last
+                flex="~ gap2" items-center p="x4 y3"
+                bg="transparent hover:gray/15" transition
+                title="Edit"
+                @click="openImportModal([{ type: item.media_type ?? type, result: item }], filesRoot)"
+              >
+                <div i-ph-pencil />
+              </button>
+              <div v-if="trailer" display-none lg:block>
+                <button
+                  flex="~ gap2" items-center p="x6 y3"
+                  bg="gray/15 hover:gray/20" transition
+                  title="Watch Trailer"
+                  @click="playTrailer()"
+                >
+                  <div i-ph-film-strip />
+                  Trailer
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </Transition>

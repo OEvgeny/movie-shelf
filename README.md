@@ -2,12 +2,21 @@
 <img height="100px" src="./public/movies.webp" />
 </p>
 
-<h1 align="center">Nuxt Movies</h1>
+<h1 align="center">Movie Shelf</h1>
+<p align="center">Personal movie management app</p>
 <br>
 
+> Forked from https://github.com/nuxt/movies  
 > Movies app demo built using [Nuxt 3](https://github.com/nuxt/framework), [Vue 3](https://github.com/vuejs/core), [UnoCSS](https://github.com/unocss/unocss), [Image Module](https://v1.image.nuxtjs.org), [The Movie Database](https://www.themoviedb.org) [API](https://www.themoviedb.org/documentation/api) and [TypeScript](https://github.com/microsoft/TypeScript).
 
-**🍿 Live preview:** https://movies.nuxt.space
+> All credits go to the folks originally developed the app (see [Credits](#Credits) bellow)  
+> This is an adoption for personal use
+
+## Added features
+- <q>Watch</q> page containing Movies listed from a remote http folder
+- Fetch movie details automatically based on file name 
+- Prowlarr integration for searching content
+- Docker image build script and saltbox-compatible docker-compose file
 
 ## Screenshots
 
@@ -19,6 +28,10 @@
 ## Proxy Server
 
 Check [proxy/README](./proxy)
+
+## Worker Server
+
+Check [worker/README](./worker)
 
 ## Setup
 
@@ -35,7 +48,7 @@ $ pnpm dev
 
 ## Credits
 
-Based on [jasonujmaalvis/vue-movies](https://github.com/jasonujmaalvis/vue-movies) and [tastejs/nuxt-movies](https://github.com/tastejs/nuxt-movies).
+Based on [nuxt/movies](https://github.com/nuxt/movies) which in turn is based on [jasonujmaalvis/vue-movies](https://github.com/jasonujmaalvis/vue-movies) and [tastejs/nuxt-movies](https://github.com/tastejs/nuxt-movies).
 
 <img height="50px" src="./public/tmdb.svg">
 

@@ -12,6 +12,12 @@
         :class="isActive ? 'i-ph-house-fill text-primary' : 'i-ph-house'"
       />
     </RouterLink>
+    <RouterLink v-slot="{ isActive }" to="/watch" title="Watch">
+      <div
+        text-2xl
+        :class="isActive ? 'i-ph-monitor-play-fill text-primary' : 'i-ph-monitor-play'"
+      />
+    </RouterLink>
     <RouterLink v-slot="{ isActive }" to="/movie" title="Movies">
       <div
         text-2xl

@@ -22,9 +22,18 @@ const [
   useImageModal,
 ] = useSingleton<(photos: Image[], index: number) => void>()
 
+const [
+  provideImportModal,
+  useImportModal,
+] = useSingleton<(suggestions: any[], entry: any) => void>()
+
+
+
 export {
   useIframeModal,
   provideIframeModal,
   useImageModal,
   provideImageModal,
+  provideImportModal,
+  useImportModal,
 }

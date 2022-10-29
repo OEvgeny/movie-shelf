@@ -121,7 +121,8 @@ export interface Genre {
 export interface QueryItem {
   type: MediaType
   title: string
-  query: string
+  query?: string
+  items?: Media[]
 }
 
 export interface Credits {

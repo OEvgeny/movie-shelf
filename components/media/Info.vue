@@ -132,7 +132,7 @@ const directors = $computed(() => item.credits?.crew.filter(person => person.job
       </div>
 
       <div>
-        <ExternalLinks :links="externalIds" />
+        <ExternalLinks :links="externalIds" :type="type" />
       </div>
     </div>
   </div>

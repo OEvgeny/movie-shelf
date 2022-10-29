@@ -1,7 +1,7 @@
 import { $fetch } from 'ohmyfetch'
 import { getQuery } from 'ufo'
 
-const TMDB_API_URL = 'https://api.themoviedb.org/3'
+const TMDB_API_URL = new URL('/3', useRuntimeConfig().tmdb.url).toString()
 
 export default defineEventHandler(async (event) => {
   // eslint-disable-next-line no-console
@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
       baseURL: TMDB_API_URL,
       params: {
         api_key: config.tmdb.apiKey,
-        language: 'en-US',
+        language: config.tmdb.lang,
         ...getQuery(event.req.url!),
       },
     })

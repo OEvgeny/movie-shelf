@@ -35,7 +35,7 @@ const AsyncWrapper = defineComponent(async (_, ctx) => {
     <AsyncWrapper>
       <template #default="{ item }">
         <NuxtLink :to="`/${type}/${item.id}`">
-          <MediaHero :item="item" />
+          <MediaHero :item="item" :type="type" />
         </NuxtLink>
       </template>
     </AsyncWrapper>

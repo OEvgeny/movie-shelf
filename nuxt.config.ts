@@ -1,7 +1,6 @@
 const isDev = process.env.NODE_ENV === 'development'
 
-// const apiBaseUrl = 'http://localhost:3001'
-const apiBaseUrl = 'https://movies-proxy.vercel.app'
+const apiBaseUrl = process.env.NUXT_PUBLIC_PROXY_URL
 
 export default defineNuxtConfig({
   modules: [
@@ -20,6 +19,12 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       apiBaseUrl,
+      proxy: {
+        url: ''
+      },
+      worker: {
+        url: ''
+      }
     },
   },
   image: {

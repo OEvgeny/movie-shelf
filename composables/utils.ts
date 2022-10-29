@@ -52,3 +52,22 @@ export function useSingleton<T>() {
     },
   ] as const
 }
+
+export function downloadM3U(entry, files) {
+  const title = entry.title ?? entry.name;
+  const data = ['#EXTM3U', '']
+  for (const file of files) {
+    data.push(`#EXTINF ${files.indexOf(file) + 1}, ${title} - ${file.name}`, file.url, '')
+  }
+  const blob = new File([data.join('\n')], `${title}.m3u`)
+  const el = document.createElement('a')
+  el.href = URL.createObjectURL(blob)
+  el.download = `${title}.m3u`      
+  document.body.appendChild(el)
+  el.click()   
+  document.body.removeChild(el)
+}
+
+let config: any
+export const getConfig = () => config
+export const setConfig = (c: any) => (config = c)

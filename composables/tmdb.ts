@@ -2,9 +2,7 @@ import { $fetch } from 'ohmyfetch'
 import LRU from 'lru-cache'
 import { hash as ohash } from 'ohash'
 import type { Credits, Media, MediaType, PageResult, Person } from '../types'
-
-// const apiBaseUrl = 'http://localhost:3001'
-const apiBaseUrl = 'https://movies-proxy.vercel.app'
+import { getConfig } from './utils'
 
 const cache = new LRU({
   max: 500,
@@ -12,9 +10,10 @@ const cache = new LRU({
 })
 
 function _fetchTMDB(url: string, params: Record<string, string | number | undefined> = {}) {
+  const tmdbUrl = new URL('/tmdb', getConfig().public.proxy.url).toString()
   return $fetch(url, {
-    baseURL: `${apiBaseUrl}/tmdb`,
-    params,
+    baseURL: tmdbUrl,
+    params: { ...params },
   })
 }
 
@@ -40,7 +39,7 @@ export function listMedia(type: MediaType, query: string, page: number): Promise
 export function getMedia(type: MediaType, id: string): Promise<Media> {
   return fetchTMDB(`${type}/${id}`, {
     append_to_response: 'videos,credits,images,external_ids,release_dates',
-    include_image_language: 'en',
+    include_image_language: 'ru,en,null',
   })
 }
 
@@ -96,7 +95,7 @@ export function getGenreList(media: string): Promise<{ name: string; id: number 
 export function getPerson(id: string): Promise<Person> {
   return fetchTMDB(`person/${id}`, {
     append_to_response: 'images,combined_credits,external_ids',
-    include_image_language: 'en',
+    include_image_language: 'ru,en,null',
   })
 }
 

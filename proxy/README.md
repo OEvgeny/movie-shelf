@@ -1,4 +1,4 @@
-# Nuxt Movies Proxy
+# Movie Shelf Proxy
 
 Proxy hosts is a lightweight proxy server for the tmdb api and youtube images.
 
@@ -11,8 +11,10 @@ Proxy hosts is a lightweight proxy server for the tmdb api and youtube images.
 
 1. Take a copy of `.env.example` and re-name to `.env`
 2. Get your [TMDB](https://developers.themoviedb.org/3) API key
-3. Enter the details into the `.env` file
-4. Start the dev server with the following scripts
+3. Get your [Prowlarr](https://wiki.servarr.com/prowlarr/quick-start-guide) API key and URL
+4. (Optionally) set TMDB content language
+5. Enter the details into the `.env` file
+6. Start the dev server with the following scripts
 
 ``` bash
 # Enable pnpm
@@ -21,6 +23,6 @@ $ corepack enable
 # Install dependencies
 $ pnpm install
 
-# Start dev server with hot reload at localhost:3001
+# Start dev server with hot reload at localhost:3003
 $ pnpm dev
 ```
