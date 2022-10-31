@@ -4,8 +4,10 @@ import { getQuery } from 'ufo'
 const TMDB_API_URL = new URL('/3', useRuntimeConfig().tmdb.url).toString()
 
 export default defineEventHandler(async (event) => {
+  const method = useMethod(event)
+  if (method === 'OPTIONS') return
   // eslint-disable-next-line no-console
-  console.log('Fetching TMDB API', event.req.url)
+  console.log('Fetching TMDB', method, event.req.url)
   const config = useRuntimeConfig()
   try {
     return await $fetch(event.context.params.path, {

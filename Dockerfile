@@ -16,8 +16,8 @@ RUN pnpm i --frozen-lockfile
 
 FROM deps-base AS prod-base
 
-ARG NUXT_PUBLIC_PROXY_URL
-ENV NUXT_PUBLIC_PROXY_URL=$NUXT_PUBLIC_PROXY_URL
+ARG NUXT_PUBLIC_PROXY_URL=http://localhost:3001
+ENV NUXT_PUBLIC_PROXY_URL=${NUXT_PUBLIC_PROXY_URL}
 
 COPY . .
 RUN pnpm build && pnpm -r build
@@ -47,9 +47,10 @@ ENV NUXT_APP_VERSION=${NUXT_APP_VERSION}
 ENV NODE_ENV=production
 
 # Default configuration
-ENV NUXT_PUBLIC_PROXY_URL=http://localhost:3001
+ARG NUXT_PUBLIC_PROXY_URL=http://localhost:3001
+ENV NUXT_PUBLIC_PROXY_URL=${NUXT_PUBLIC_PROXY_URL}
+ENV NITRO_WORKER_PROXY_URL=http://localhost:3001
 ENV NUXT_PUBLIC_WORKER_URL=http://localhost:3002
-ENV NITRO_WORKER_PROXY_URL=http://localhost:3002
 
 # start the app
 CMD [ "bash", "/app/start.sh" ]

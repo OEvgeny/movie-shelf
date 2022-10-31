@@ -66,6 +66,7 @@ export default defineEventHandler(async ({ req, res }) => {
   // - res.writable - always true
   // - res.write() - never fails
   // - req.on('close') - never happens
+  // Update: prod logs show this works
   res.socket?.on('error', () => res.emit('close'))
   
   res.on('close', () => {

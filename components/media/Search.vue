@@ -52,8 +52,12 @@ throttledSearch()
 
 const save = async (item: any) => {
   const { guid, indexerId } = item
-  await saveToProwlarr({guid, indexerId })
-  item.saved = true
+  item.saving = true
+  try {
+    await saveToProwlarr({guid, indexerId })
+    item.saved = true
+  } catch {}
+  item.saving = false
 }
 
 function humanFileSize(bytes, si=false, dp=1) {
@@ -96,7 +100,7 @@ function getCategories (categories: any[]) {
         @keyup.enter="search"
       >
     </div>
-    <table class="zebra" v-if="items.length" tex-center w-full overflow-hidden>
+    <table class="table zebra" v-if="items.length" tex-center w-full overflow-hidden>
       <thead>
         <th>Title</th>
         <th>Age</th>
@@ -118,7 +122,8 @@ function getCategories (categories: any[]) {
             <button v-if="!item.saved" n-link @click="save(item)">
               <div i-ph-cloud-arrow-up />
             </button>
-            <div v-else text-lime i-ph-cloud-check />
+            <div v-else-if="item.saving" inline-block animate-spin i-ph-spinner />
+            <div v-else inline-block text-lime i-ph-cloud-check />
           </td>
         </tr>
       </tbody>
@@ -128,16 +133,16 @@ function getCategories (categories: any[]) {
 
 <style scoped>
 
-td, th {
-  @apply px6 py3;
+.table td, .table th {
+  --at-apply: px6 py3;
 }
 
-.zebra th, .zebra tr:nth-child(2n) td {
-  @apply bg-primary/10;
+.zebra th, .zebra tr:nth-child(even) td {
+  --at-apply: bg-primary bg-opacity-10;
 }
 
-.zebra tr:nth-child(2n+1) td {
-  @apply bg-primary/5;
+.zebra tr:nth-child(odd) td {
+  --at-apply: bg-primary bg-opacity-5;
 }
 
 </style>

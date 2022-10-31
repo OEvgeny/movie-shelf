@@ -8,14 +8,12 @@ useHead({
     lang: 'en',
   },
   charset: 'utf-8',
-  title: 'Nuxt Movies',
-  titleTemplate: title => title !== 'Nuxt Movies' ? `${title} · Nuxt Movies` : title,
+  title: 'Movie Shelf',
+  titleTemplate: title => title !== 'Movie Shelf' ? `${title} · Movie Shelf` : title,
   meta: [
-    { name: 'description', content: 'A TMDB client built with Nuxt Image to show the potential of it ✨' },
-    { property: 'og:image', content: 'https://movies.nuxt.space/social-card.png' },
+    { name: 'description', content: 'A personal movie management app ✨' },
+    { property: 'og:image', content: '/movies.webp' },
     { name: 'twitter:card', content: 'summary_large_image' },
-    { name: 'twitter:site', content: '@nuxt_js' },
-    { name: 'twitter:creator', content: '@nuxt_js' },
   ],
   link: [
     {
@@ -27,7 +25,9 @@ useHead({
 
 <template>
   <NuxtLayout>
-    <NuxtLoadingIndicator />
+    <NuxtLoadingIndicator
+      color="repeating-linear-gradient(to right,#93002d 0%,#dc0043 50%,#e60014 100%)"
+    />
     <NuxtPage />
   </NuxtLayout>
 </template>
@@ -41,4 +41,5 @@ html, body , #__nuxt{
   color: white;
   color-scheme: dark;
 }
+
 </style>

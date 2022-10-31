@@ -33,7 +33,7 @@ export default defineNuxtConfig({
       proxy: {
         provider: 'ipx',
         options: {
-          baseURL: `${apiBaseUrl}/ipx`,
+          baseURL: new URL('/ipx', apiBaseUrl).toString(),
         },
       },
     },

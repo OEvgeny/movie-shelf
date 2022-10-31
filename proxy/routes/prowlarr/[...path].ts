@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
   if (method === 'OPTIONS') return
   const body = await readBody(event).catch(e => console.log(e))
   // eslint-disable-next-line no-console
-  console.log('Fetching Prowarr API', method, event.req.url, body ?? '')
+  console.log('Fetching Prowarr', method, event.req.url, body ?? '')
   const config = useRuntimeConfig()
   try {
     return await $fetch(event.context.params.path, {

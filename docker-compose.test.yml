@@ -1,0 +1,19 @@
+version: '3.3'
+
+services:
+  movie-shelf:
+    build:
+      context: .
+    container_name: movie-shelf
+    environment:
+      - PGID=1001
+      - PUID=1000
+      - NITRO_TMDB_API_KEY=${NITRO_TMDB_API_KEY}
+      - NITRO_PROWLARR_URL=${NITRO_PROWLARR_URL}
+      - NITRO_PROWLARR_API_KEY=${NITRO_PROWLARR_API_KEY}
+      - NITRO_WORKER_REMOTE_FOLDER_URL=${NITRO_WORKER_REMOTE_FOLDER_URL}
+      - NITRO_TMDB_LANG=${NITRO_TMDB_LANG}
+    ports:
+      - 3000:3000
+      - 3001:3001
+      - 3002:3002
