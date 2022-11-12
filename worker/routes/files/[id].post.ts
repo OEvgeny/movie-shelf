@@ -1,5 +1,5 @@
 import { fetchTMDB } from "../../processMovies"
-import { handleFileUpdate } from "~~/worker/files"
+import { handleFileUpdate } from "../../files"
 
 export default defineEventHandler(async (ev) => {
   const body = await readBody(ev)
