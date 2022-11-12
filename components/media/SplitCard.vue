@@ -5,7 +5,7 @@ const props = defineProps<{
   delay: number,
   items: Array<{
     type: MediaType
-    item: Media
+    result: Media
   }>
 }>()
 
@@ -25,9 +25,14 @@ onMounted(() => {
 
 <template>
   <div class="split" inline-grid items-end place-items-center cursor-pointer>
-    <Transition name="slide" v-for="item, index of items" col-start-1 row-start-1 bg-black w-full>
-      <MediaCard to="" v-if="index === activeSlide" :key="index" :type="item.type" :item="item.result" />
-    </Transition>
+    <template v-if="items?.length">
+      <Transition name="slide" v-for="item, index of items" col-start-1 row-start-1 bg-black w-full>
+        <MediaCard to="" v-if="index === activeSlide" :key="index" :type="item.type" :item="item.result" />
+      </Transition>
+    </template>
+    <template v-else>
+      <slot name="no-media" />
+    </template>
   </div>
 </template>
 

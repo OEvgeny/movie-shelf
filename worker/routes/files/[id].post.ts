@@ -1,4 +1,5 @@
-import { getFiles, setFiles } from "../../storage"
+import { fetchTMDB } from "../../processMovies"
+import { handleFileUpdate } from "~~/worker/files"
 
 export default defineEventHandler(async (ev) => {
   const body = await readBody(ev)
@@ -6,11 +7,14 @@ export default defineEventHandler(async (ev) => {
   if (!body) {
     return createError({ statusCode: 400, statusMessage: 'No body'})
   }
-  body.id = id
+  let file: unknown
   try {
-    await setFiles([body])
+    const { tmdbId, type } = body
+    const entry = await fetchTMDB(`${type}/${tmdbId}`)
+    file = handleFileUpdate({ tmdb: { type, result: entry } }, id)
   } catch (err) {
+    // @ts-expect-error
     return createError({ statusCode: 400, statusMessage: err?.message })
   }
-  return (await getFiles()).find((item: { id: string }) => item.id === body.id)
+  return file
 })

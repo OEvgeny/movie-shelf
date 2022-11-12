@@ -3,7 +3,7 @@ import type { Media, MediaType } from '~/types'
 
 defineProps<{
   type: MediaType
-  item: Media
+  item: Partial<Media>
 }>()
 </script>
 
@@ -28,7 +28,7 @@ defineProps<{
         <div i-ph:question ma text-4xl />
       </div>
     </div>
-    <div mt-2>
+    <div mt-2 class="title">
       {{ item.title || item.name }}
     </div>
     <div flex text-sm gap-2 items-center>

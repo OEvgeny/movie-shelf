@@ -1,4 +1,4 @@
-import { getFiles } from "../../storage"
+import { getFiles } from "../../files"
 
 export default defineEventHandler(async ({ res }) => {
   res.setHeader('Cache-Control', 'no-cache')

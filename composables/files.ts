@@ -1,6 +1,7 @@
+import { File, FileTMDBMedia, FileTMDBSuggestions, Media } from "~~/types";
 import { getConfig } from "./utils"
 
-const data = ref([])
+const data = ref<File[]>([])
 
 const sortData = () => {
   data.value.sort((a, b) => {
@@ -21,6 +22,7 @@ const initClientConnection = () => inProgress = inProgress ?? new Promise(resolv
 
   source.addEventListener('files', event => {
     data.value = JSON.parse(event.data)
+    // @ts-expect-error
     resolve()
   })
   
@@ -38,30 +40,43 @@ const initClientConnection = () => inProgress = inProgress ?? new Promise(resolv
 
 const initServerConnection = async () => {
   const url = new URL('/files', getConfig().public.worker.url).toString()
+  // @ts-expect-error
   data.value = await $fetch(url)
 }
 
 export const initConnection = process.client ? initClientConnection : initServerConnection
 
-const extractTMDBEntry = ({ tmdb }) => tmdb.result
+const extractTMDBEntry = ({ tmdb }: File) => tmdb?.result
+
+const allMovies = computed(() => data.value
+  .filter(({ tmdb }) => tmdb?.type === 'movie')
+  .map(extractTMDBEntry) as Media[])
+
+export const adultMovies = reactive({
+  items: computed(() => allMovies.value.filter(entry => entry.adult)),
+})
+
+export const kidsMovies = reactive({
+  items: computed(() => allMovies.value.filter(entry => entry.kids)),
+})
 
 export const movies = reactive({
-  items: computed(() => data.value.filter(({ tmdb }) => tmdb.type === 'movie').map(extractTMDBEntry)),
+  items: computed(() => allMovies.value.filter(entry => !entry.adult)),
 })
 
 export const shows = reactive({
-  items: computed(() => data.value.filter(({ tmdb }) => tmdb.type === 'tv').map(extractTMDBEntry)),
+  items: computed(() => data.value.filter(({ tmdb }) => tmdb?.type === 'tv').map(extractTMDBEntry)),
 })
 
 export const imports = reactive({
-  items: computed(() => data.value.filter(({ tmdb }) => tmdb.type === 'suggestions').map(extractTMDBEntry)),
-  files: computed(() => data.value.filter(({ tmdb }) => tmdb.type === 'suggestions'))
+  items: computed(() => data.value.filter(({ tmdb }) => tmdb?.type === 'suggestions').map(extractTMDBEntry)) as unknown as FileTMDBMedia[][],
+  files: computed(() => data.value.filter(({ tmdb }) => tmdb?.type === 'suggestions')) as unknown as File<FileTMDBSuggestions>[]
 })
 
 export const getFiles = (t: string, id: string) => data.value.find(({ tmdb: {type, result} }) => result?.id === id && type === t)?.files?.files
 export const getFilesRoot = (t: string, id: string) => data.value.find(({ tmdb: {type, result} }) => result?.id === id && type === t)
 
-export const updateFile = (file: any, fields: any) => {
+export const updateFile = (file: File, fields: Record<string, unknown>) => {
   const baseURL = new URL('/files', getConfig().public.worker.url).toString()
   $fetch(`/${file.id}`, { baseURL, method: 'POST', body: fields })
 }

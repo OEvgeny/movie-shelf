@@ -1,5 +1,25 @@
 <script lang="ts" setup>
 
+type SearchResultCategory = {
+  name?: string
+  id: number
+}
+
+type SearchResult = {
+  guid: string
+  title: string
+  infoUrl: string
+  age: number
+  indexer: string
+  indexerId: number
+  categories: SearchResultCategory[]
+  size: number
+  seeders: number
+  leechers: number
+  saving?: boolean
+  saved?: boolean
+}
+
 const { query } = defineProps<{
   query?: string
 }>()
@@ -7,10 +27,10 @@ const { query } = defineProps<{
 let count = $ref<undefined | number>()
 const input = $ref<string>(query ?? '')
 
-let items = $ref<any[]>([])
+let items = $ref<SearchResult[]>([])
 let currentSearch = $ref<string>()
 
-const getSortPredicate = (field) => (a, b) => {
+const getSortPredicate = (field: 'size' | 'seeders') => (a: SearchResult, b: SearchResult) => {
   const fieldA = a[field]
   const fieldB = b[field]
   return fieldA > fieldB
@@ -50,17 +70,19 @@ watch(
 throttledSearch()
 
 
-const save = async (item: any) => {
+const save = async (item: SearchResult) => {
   const { guid, indexerId } = item
   item.saving = true
+  item.saved = true
   try {
     await saveToProwlarr({guid, indexerId })
-    item.saved = true
-  } catch {}
+  } catch {
+    item.saved = false
+  }
   item.saving = false
 }
 
-function humanFileSize(bytes, si=false, dp=1) {
+function humanFileSize(bytes: number, si = false, dp = 1) {
   const thresh = si ? 1000 : 1024;
 
   if (Math.abs(bytes) < thresh) {
@@ -82,7 +104,7 @@ function humanFileSize(bytes, si=false, dp=1) {
   return bytes.toFixed(dp) + ' ' + units[u];
 }
 
-function getCategories (categories: any[]) {
+function getCategories (categories: SearchResultCategory[]) {
   return categories?.map(c => c.name).filter(c => c).join(', ')
 }
 
@@ -100,34 +122,36 @@ function getCategories (categories: any[]) {
         @keyup.enter="search"
       >
     </div>
-    <table class="table zebra" v-if="items.length" tex-center w-full overflow-hidden>
-      <thead>
-        <th>Title</th>
-        <th>Age</th>
-        <th>Source</th>
-        <th>Category</th>
-        <th>Size</th>
-        <th>Peers</th>
-        <th></th>
-      </thead>
-      <tbody>
-        <tr text-center v-for="item of items" :class="{ 'opacity-50': item.seeders === 0 }">
-          <td text-left min-w-80 max-w-100><a :href="item.infoUrl" n-link target="_blank" rel="nofollow,noopener">{{ item.title }}</a></td>
-          <td>{{ item.age }} days</td>
-          <td>{{ item.indexer }}</td>
-          <td>{{ getCategories(item.categories) }}</td>
-          <td>{{ humanFileSize(item.size) }}</td>
-          <td>{{ item.seeders }} / {{ item.leechers }}</td>
-          <td>
-            <button v-if="!item.saved" n-link @click="save(item)">
-              <div i-ph-cloud-arrow-up />
-            </button>
-            <div v-else-if="item.saving" inline-block animate-spin i-ph-spinner />
-            <div v-else inline-block text-lime i-ph-cloud-check />
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div overflow-y-auto>
+      <table class="table zebra" v-if="items.length" tex-center w-full overflow-hidden>
+        <thead>
+          <th>Title</th>
+          <th>Age</th>
+          <th>Source</th>
+          <th>Category</th>
+          <th>Size</th>
+          <th>Peers</th>
+          <th></th>
+        </thead>
+        <tbody>
+          <tr text-center v-for="item of items" :class="{ 'opacity-50': item.seeders === 0 }">
+            <td text-left min-w-80 max-w-100><a :href="item.infoUrl" n-link target="_blank" rel="nofollow,noopener">{{ item.title }}</a></td>
+            <td>{{ item.age }} days</td>
+            <td>{{ item.indexer }}</td>
+            <td>{{ getCategories(item.categories) }}</td>
+            <td>{{ humanFileSize(item.size) }}</td>
+            <td>{{ item.seeders }} / {{ item.leechers }}</td>
+            <td>
+              <button v-if="!item.saved" n-link @click="save(item)">
+                <div i-ph-cloud-arrow-up />
+              </button>
+              <div v-else-if="item.saving" inline-block animate-spin i-ph-spinner />
+              <div v-else inline-block text-lime i-ph-cloud-check />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -135,6 +159,10 @@ function getCategories (categories: any[]) {
 
 .table td, .table th {
   --at-apply: px6 py3;
+}
+
+.table td a {
+  word-break: break-all;
 }
 
 .zebra th, .zebra tr:nth-child(even) td {

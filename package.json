@@ -4,6 +4,7 @@
   "scripts": {
     "build": "nuxi build",
     "dev": "PORT=3001 nuxi dev",
+    "dev:all": "pnpm -r --if-present dev & pnpm dev",
     "dev:proxy": "cd proxy && pnpm dev",
     "start": "node .output/server/index.mjs",
     "postinstall": "nuxi prepare",

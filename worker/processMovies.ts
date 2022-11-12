@@ -42,15 +42,17 @@ const filterTokens = ((arr: string[]) => arr)([
   /* source quality */
   'bdrip', 'hdtvrip', 
   /* resolution */
-  '1080p', '720p',
+  '1080p', '720p', '1080i',
   /* audio encoder */
   'ddp5',
   /* video encoder */
-  'x264', 'x265',
+  'x264', 'x265', 'mp4-ktr',
   /* content source */
   'tv-hd', 'atvp', 'web-dl', 'web-dlrip',
   /* release group */
-  'kinozal', 'pk'
+  'kinozal', 'pk',
+  /* content type */
+  'xxx'
 ])
 
 const formatFileName = (fileName: string) => fileName
@@ -104,14 +106,51 @@ const getMovieSuggestedIds = async (fileName: string) => {
   return { query, results }
 }
 
-const getTMDBEntry = async (results: any[]) => {
+const kidsCertifications = {
+  US: ['P'],
+  RU: ['0+', '3+'],
+  CA: ['G'],
+  AU: ['G'],
+  NZ: ['G'],
+  FI: ['S', 'K-7'],
+  BG: ['A'],
+  PH: ['G'],
+  IE: ['G'],
+  NO: ['6'],
+  PT: ['M/3'],
+}
+
+const isKidsMovie = (movie: any) => {
+  if (movie.adult) return false
+  const releases = movie?.release_dates?.results ?? []
+  const certifications: Array<{ 
+    country: keyof typeof kidsCertifications, 
+    certification: string
+  }> = [].concat(...releases.map((release: any) => release.release_dates
+    .filter((r: any) => r.certification)
+    .map(({ certification }: any) => ({ country: release.iso_3166_1, certification }))
+  ))
+  return certifications.some(c => kidsCertifications[c.country]?.includes(c.certification))
+}
+
+export const fetchTMDB = async (url: string, params?: any | undefined) => {
   const { worker } = useRuntimeConfig()
   const baseURL = new URL('/tmdb/', worker.proxyUrl).toString()
-  const handleError = e => {
-    console.log(e)
+  const handleError = (e: Error) => {
+    console.error(e)
   }
-  const fetchTMDB = (url: string, params?: any | undefined) => $fetch<any>(url, { baseURL, ...params }).catch(handleError)
-  
+  const result = await $fetch(url, { 
+    baseURL, 
+    query: {
+      append_to_response: 'release_dates',
+      ...params
+    }
+  }).catch(handleError)
+  if (result) result.kids = isKidsMovie(result)
+  return result
+}
+
+const getTMDBEntry = async (results: any[]) => {
   const mostLikelyGoogleResult = results.find(r => r.engine === 'google')
   const mostLikelyBingResult = results.find(r => r.engine === 'bing')
   let mostLikelyResult
@@ -126,7 +165,7 @@ const getTMDBEntry = async (results: any[]) => {
   let firstImdbResult
   if (imdbResult) {
     const firstResult = mostLikelyGoogleResult ?? mostLikelyBingResult
-    const info = await fetchTMDB(`/find/${imdbResult.id}`, { query: { external_source: 'imdb_id' }})
+    const info = await fetchTMDB(`/find/${imdbResult.id}`, { external_source: 'imdb_id' })
     if (info) {
       const [firstResultFromImdb] = (firstResult ? info[`${firstResult.type}_results`] : info.movie_results ?? info.tv_results) ?? []
       const type = firstResult.type ?? (info.movie_results && 'movie') ?? (info.tv_results && 'tv')
@@ -137,7 +176,7 @@ const getTMDBEntry = async (results: any[]) => {
     }
   }
   let firstGoogleTmdb
-  if (mostLikelyGoogleResult && mostLikelyGoogleResult.provider === 'tmdb') {
+  if (mostLikelyGoogleResult?.provider === 'tmdb') {
     const result = await fetchTMDB(`/${mostLikelyGoogleResult.type}/${mostLikelyGoogleResult.id}`)
     if (result && results.some(r => r !== mostLikelyGoogleResult && (r.id === result.id || r.id === result.imdb_id))) {
       return { result, type: mostLikelyGoogleResult.type }
@@ -145,41 +184,47 @@ const getTMDBEntry = async (results: any[]) => {
     firstGoogleTmdb = result && { result, type: mostLikelyGoogleResult.type }
   }
   let firstBingTmdb
-  if (mostLikelyBingResult && mostLikelyBingResult.provider === 'tmdb') {
-    const result = await fetchTMDB(`/${mostLikelyBingResult.type}/${mostLikelyBingResult.id}`, { baseURL })
+  if (mostLikelyBingResult?.provider === 'tmdb') {
+    const result = await fetchTMDB(`/${mostLikelyBingResult.type}/${mostLikelyBingResult.id}`)
     if (result && results.some(r => r !== mostLikelyBingResult && (r.id === result.id || r.id === result.imdb_id))) {
       return { result, type: mostLikelyBingResult.type }
     }
     firstBingTmdb = result && { result, type: mostLikelyBingResult.type }
   }
-  const suggestions = [firstGoogleTmdb, firstBingTmdb, firstImdbResult].filter(s => s)
-  return suggestions.length > 1 ? { type: 'suggestions', result: suggestions } : suggestions[0]
+  const suggestions = [firstGoogleTmdb, firstBingTmdb, firstImdbResult].filter(s => s?.result)
+  return suggestions.length > 1 || suggestions.length === 0 ? { type: 'suggestions', result: suggestions } : suggestions[0]
 }
 
 export const processMovies = async function* (url: string, storedFiles: any[]) { 
   const { files = [] } = await getFileList(url)
   console.log('Got', files.length, 'files from remote')
   let cachedCount = 0
-  for (let file of files) {
+  const processed = []
+  for (const file of files) {
     file.id = calculateEntryId(file)
     const storedFile = storedFiles.find(f => f.id === file.id)
     if (storedFile) {
-      const index = files.indexOf(file)
-      file = { ...storedFile }
-      files[index] = file
-      if (file.search?.results.some(entry => ['google', 'bing'].includes(entry.engine))) {
+      Object.assign(file, storedFile)
+      if (file.state?.isUpdated 
+       || file.state?.isDeleted 
+       || file.tmdb?.result
+       || file.search?.results.some(entry => ['google', 'bing'].includes(entry.engine))
+      ) {
         cachedCount++
         continue
       }
+    }
+    file.state = {
+      isDeleted: false,
+      isUpdated: false,
+      ...file.state
     }
     file.search = await getMovieSuggestedIds(file.name)
     file.tmdb = await getTMDBEntry(file.search.results)
     if (file.type === 'directory') {
       file.files = await getFileList(`${url}${file.name}`)
     }
-    file.state = {
-      isDeleted: false
-    }
+    processed.push(file)
     yield file
   }
   console.log('Processed', files.length, 'from cache', cachedCount)

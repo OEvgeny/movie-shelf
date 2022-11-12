@@ -2,6 +2,7 @@ export type MediaType = 'movie' | 'tv'
 
 export interface Media {
   adult: boolean
+  kids: boolean
   backdrop_path: string
   genre_ids: number[]
   id: string
@@ -127,4 +128,27 @@ export interface QueryItem {
 
 export interface Credits {
   cast: Media[]
+}
+
+export type FileTMDBMedia = {
+  type: 'movie' | 'tv'
+  result: Media
+}
+export type FileTMDBSuggestions = {
+  type: 'suggestions'
+  result: FileTMDBMedia[]
+}
+
+export type File<T = FileTMDBMedia | FileTMDBSuggestions> = {
+  id: string
+  name: string
+  lastModified: string
+  search: {
+    query: string
+  },
+  tmdb: T
+  state: {
+    isDeleted: boolean
+    isUpdated: boolean
+  }
 }

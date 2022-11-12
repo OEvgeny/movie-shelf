@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { onKeyDown } from '@vueuse/core'
-import type { Media } from '~~/types';
+import type { Media, File, FileTMDBMedia } from '~~/types';
 
-let suggestions = $ref<Image[] | null>(null)
-let file = $ref(null)
+const router = useRouter()
+
+let suggestions = $ref<FileTMDBMedia[] | null>(null)
+let file = $ref<File | null>(null)
 
 provideImportModal((s, f) => {
   suggestions = s
@@ -19,17 +21,18 @@ let tab = $ref<'search' | 'suggestions'>('search')
 
 watch($$(file), () => tab = 'suggestions')
 
-const processImport = (entry) => {
-  updateFile(file, { tmdb: entry })
+const processImport = (entry: FileTMDBMedia) => {
+  if (!file) return
+  updateFile(file, { tmdbId: entry.result.id, type: entry.type })
+  router.push(`/${entry.type}/${entry.result.id}`)
   file = null
 }
 
 let count = $ref<undefined | number>()
-const input = $ref<string>()
+let input = $ref<string>()
 
 let items = $ref<Media[]>([])
 let currentSearch = $ref(input)
-
 
 watchEffect(() => {
   if (file?.search.query) input = file.search.query ?? ''

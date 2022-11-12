@@ -10,7 +10,7 @@ const tab = $ref<'overview' | 'videos' | 'photos' | 'search'>('overview')
 </script>
 
 <template>
-  <div flex items-center justify-center gap8 py6>
+  <div flex items-center justify-center gap2 lg:gap8 py6>
     <button n-tab :class="{ 'n-tab-active': tab === 'overview' }" @click="tab = 'overview'">
       Overview
     </button>

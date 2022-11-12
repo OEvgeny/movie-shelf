@@ -49,7 +49,7 @@ const openImportModal = useImportModal()
     >
       <Transition appear name="hero">
         <div v-show="mounted">
-          <h1 mt-2 text-4xl lg:text-5xl line-clamp-2>
+          <h1 class="title" mt-2 text-4xl lg:text-5xl line-clamp-2>
             {{ item.title || item.name }}
           </h1>
           <div flex="~ row wrap" gap3 items-center mt4>
@@ -118,7 +118,7 @@ const openImportModal = useImportModal()
   </div>
 </template>
 
-<style>
+<style scoped>
 .hero-enter-active,
 .hero-leave-active {
   transition: transform .75s cubic-bezier(.4, .25, .3, 1), opacity .3s cubic-bezier(.4, .25, .3, 1);
@@ -134,5 +134,9 @@ const openImportModal = useImportModal()
 .hero-leave-from {
   opacity: 1;
   transform: translateZ(0);
+}
+
+.title {
+  line-height: 1.5;
 }
 </style>

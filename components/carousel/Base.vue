@@ -24,7 +24,7 @@ function scrollRight() {
     <slot name="more" />
   </div>
   <div relative>
-    <div ref="scrollEl" overflow-y-auto>
+    <div class="content" ref="scrollEl" overflow-y-auto>
       <div flex gap-2 w-max p-2 px-10>
         <slot />
       </div>
@@ -45,3 +45,25 @@ function scrollRight() {
     </button>
   </div>
 </template>
+
+<style scoped>
+
+.content {
+  scrollbar-width: thin;
+  scroll-snap-type: x mandatory;
+}
+
+.content:deep(a) {
+  scroll-snap-align: center;
+}
+
+::-webkit-scrollbar {
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.1);
+}
+
+
+</style>

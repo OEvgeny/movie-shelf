@@ -1,5 +1,5 @@
 import { useSingleton } from './utils'
-import type { Image, Media, Video } from '~/types'
+import type { File, FileTMDBMedia, Image, Media, Video } from '~/types'
 
 export function getTrailer(item: Media) {
   const trailer = item.videos?.results?.find(video => video.type === 'Trailer')
@@ -25,7 +25,7 @@ const [
 const [
   provideImportModal,
   useImportModal,
-] = useSingleton<(suggestions: any[], entry: any) => void>()
+] = useSingleton<(suggestions: FileTMDBMedia[], entry: File) => void>()
 
 
 

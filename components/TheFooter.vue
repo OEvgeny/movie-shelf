@@ -10,7 +10,7 @@
       <p text-true-gray:90 text-sm>
         Data provided by&nbsp;
         <a op100 target="_blank" href="https://www.themoviedb.org/" title="The Movie Database" rel="noopener" n-link-text>
-          <IconTMDB inline h4 />
+          <IconTMDB class="tmdb-icon" inline h4 />
         </a>
       </p>
     </div>
@@ -28,3 +28,15 @@
     </div>
   </footer>
 </template>
+
+<style scoped>
+
+.tmdb-icon {
+  filter: saturate(0) brightness(0.75);
+}
+
+.tmdb-icon:hover {
+  filter: sepia(1) hue-rotate(292deg) brightness(0.51) saturate(3.5) contrast(2);
+}
+
+</style>
