@@ -10,7 +10,7 @@ const tab = $ref<'overview' | 'videos' | 'photos' | 'search'>('overview')
 </script>
 
 <template>
-  <div flex items-center justify-center gap2 lg:gap8 py6>
+  <ScrollArea flex items-center justify-between px4 sm:justify-center gap2 lg:gap8 overflow-y-auto my6>
     <button n-tab :class="{ 'n-tab-active': tab === 'overview' }" @click="tab = 'overview'">
       Overview
     </button>
@@ -23,9 +23,9 @@ const tab = $ref<'overview' | 'videos' | 'photos' | 'search'>('overview')
     <button n-tab :class="{ 'n-tab-active': tab === 'search' }" @click="tab = 'search'">
       Search
     </button>
-  </div>
+  </ScrollArea>
   <MediaOverview v-if="tab === 'overview'" :item="item" :type="type" />
   <MediaVideos v-if="tab === 'videos'" :item="item" />
   <MediaPhotos v-if="tab === 'photos'" :item="item" />
-  <MediaSearch v-if="tab === 'search'" :query="item.title ?? item.name" />
+  <MediaSearch v-if="tab === 'search'" :query="item.title ?? item.name" :show-adult="item.adult" />
 </template>

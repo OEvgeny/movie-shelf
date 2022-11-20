@@ -19,7 +19,7 @@ onKeyDown('Escape', () => {
 
 let tab = $ref<'search' | 'suggestions'>('search')
 
-watch($$(file), () => tab = 'suggestions')
+watch($$(file), () => tab = suggestions?.length ?  'suggestions' : 'search')
 
 const processImport = (entry: FileTMDBMedia) => {
   if (!file) return
@@ -73,7 +73,7 @@ watch(
     </button>
     <div flex flex-col gap8 w-full p8 of-auto data-scroll>
       <div flex py3 px10 items-center mt5>
-        <div text-2xl>
+        <div text-2xl break-all>
           Import {{ file.name.replace('/', '') }}
         </div>
       </div>
@@ -91,7 +91,7 @@ watch(
         </MediaGrid>
       </template>
       <template v-else-if="tab === 'search'">
-        <div flex bg-gray:10 items-center px6 py4 gap3 sticky>
+        <div flex bg-gray:10 items-center px4 md:px6 py4 gap3 sticky>
           <div i-ph:magnifying-glass text-xl op50 />
           <input
             v-model="input"
@@ -121,7 +121,7 @@ watch(
           </template>
           <div>Search result for: {{ currentSearch }}</div>
         </MediaAutoLoadGrid>
-        <div v-else text-4xl p10 font-100 op50 text-center>
+        <div v-else text-4xl p4 md:p10 font-100 op50 text-center>
           Type something to search...
         </div>
       </template>

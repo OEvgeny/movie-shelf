@@ -2,14 +2,29 @@
 import type { Media, MediaType } from '~/types'
 import { formatTime } from '~/composables/utils'
 
-const { item, type = item?.media_type } = defineProps<{
+const { item, type = item?.media_type, to } = defineProps<{
+  to: any,
   item: Media,
   type?: MediaType
 }>()
 
 const trailer = $computed(() => getTrailer(item))
 
+const preferredReleaseLangs = useRuntimeConfig().public.ratingCountries.split(',')
+const rating = $computed(() => {
+  const ratings = new Map<string, string>()
+  for (const result of item.release_dates?.results ?? []) {
+    if (!preferredReleaseLangs.includes(result.iso_3166_1)) continue
+    const cert = result.release_dates.find(date => date.certification)?.certification
+    if (!cert) continue
+    ratings.set(result.iso_3166_1, cert)
+    if (ratings.size === preferredReleaseLangs.length) break
+  }
+  return ratings.get(preferredReleaseLangs.find(lang => ratings.get(lang)) ?? preferredReleaseLangs[0])
+})
+
 const showModal = useIframeModal()
+
 function playTrailer() {
   if (trailer)
     showModal(trailer)
@@ -17,15 +32,14 @@ function playTrailer() {
 
 const mounted = useMounted()
 
-const files = computed(() => getFiles(type, item.id))
-const filesRoot = computed(() => getFilesRoot(type, item.id))
+const openEditModal = useEditModal()
 
-const openImportModal = useImportModal()
+const files = computed(() => getFiles(type, item.id))
 
 </script>
 
 <template>
-  <div :key="item.id" relative class="aspect-ratio-1/1 md:aspect-ratio-3/2 lg:aspect-ratio-25/9" bg-black>
+  <div :key="item.id" relative isolate class="aspect-ratio-1/1 md:aspect-ratio-3/2 lg:aspect-ratio-25/9" bg-black>
     <div
       absolute top-0 right-0
       lt-lg="left-0"
@@ -40,6 +54,7 @@ const openImportModal = useImportModal()
         h-full w-full object-cover
       />
     </div>
+    <NuxtLink v-if="to" absolute bottom-0 left-0 top-0 right-0 :to="to" z1 />
     <div
       absolute bottom-0 left-0 top-0 px-10
       flex="~ col" justify-center
@@ -66,12 +81,15 @@ const openImportModal = useImportModal()
             <div v-if="item.runtime" op50>
               {{ formatTime(item.runtime) }}
             </div>
+            <div v-if="rating" op50>
+              {{ rating }}
+            </div>            
           </div>
           <p mt-2 op80 leading-relaxed of-hidden line-clamp-3 md:line-clamp-5 text-xs md:text-base>
             {{ item.overview }}
           </p>
-          <div flex="~ gap2" py5>
-            <div v-if="files" flex gap2>
+          <div flex="~ gap2" py5 z1 relative z2>
+            <div v-if="files.length" flex gap2>
               <button
                 flex="~ gap2" items-center p="x6 y3"
                 bg="lime/70 hover:lime/75" transition
@@ -86,34 +104,27 @@ const openImportModal = useImportModal()
                 flex="~ gap2" items-center p="x4 y3"
                 bg="transparent hover:gray/15" transition
                 title="Edit"
-                @click="openImportModal([{ type: item.media_type ?? type, result: item }], filesRoot)"
+                @click.stop="openEditModal(item, type)"
               >
                 <div i-ph-pencil />
               </button>
-              <div v-if="trailer" display-none lg:block>
+              <template v-if="trailer">
                 <button
-                  flex="~ gap2" items-center p="x6 y3"
+                  flex="~ gap2" items-center p="x4 y3 md:x6"
                   bg="gray/15 hover:gray/20" transition
                   title="Watch Trailer"
                   @click="playTrailer()"
                 >
                   <div i-ph-film-strip />
-                  Trailer
+                  <span display-none md:display-inline>
+                    Trailer
+                  </span>
                 </button>
-              </div>
+              </template>
             </div>
           </div>
         </div>
       </Transition>
-    </div>
-    <div v-if="trailer" lg:hidden absolute left-0 top-0 right-0 h="2/3" items-center justify-center>
-      <button
-        items-center p10 text-5xl op20 hover:op80 transition
-        title="Watch Trailer"
-        @click="playTrailer()"
-      >
-        <div i-ph-play-circle-light />
-      </button>
     </div>
   </div>
 </template>

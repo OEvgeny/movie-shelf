@@ -24,20 +24,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="split" inline-grid items-end place-items-center cursor-pointer>
+  <div class="split" inline-grid cursor-pointer>
     <template v-if="items?.length">
-      <Transition name="slide" v-for="item, index of items" col-start-1 row-start-1 bg-black w-full>
-        <MediaCard to="" v-if="index === activeSlide" :key="index" :type="item.type" :item="item.result" />
+      <Transition name="slide" v-for="item, index of items" col-start-1 row-start-1 w-full>
+        <div v-if="index === activeSlide" :key="index">
+          <MediaCard to="" :type="item.type" :item="item.result" />
+        </div>
       </Transition>
     </template>
-    <template v-else>
+    <div v-else w-full>
       <slot name="no-media" />
-    </template>
+    </div>
   </div>
 </template>
 
 <style scoped>
-
 
 .slide-enter-active,
 .slide-leave-active {

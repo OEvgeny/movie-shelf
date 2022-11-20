@@ -12,6 +12,18 @@ export interface Media {
   popularity: number
   poster_path: string
   release_date?: string
+  release_dates?: {
+    results: Array<{
+      iso_3166_1: string,
+      release_dates: Array<{
+        certification: string
+        iso_639_1: string
+        note: string
+        release_date: string
+        type: number
+      }>
+    }>
+  }
   first_air_date?: string
   title: string
   name?: string
@@ -151,4 +163,18 @@ export type File<T = FileTMDBMedia | FileTMDBSuggestions> = {
     isDeleted: boolean
     isUpdated: boolean
   }
+}
+
+export type Notification = {
+  title?: string
+  subtitle?: string
+  type?: 'loading' | 'success'
+  media?: Partial<Media>
+  action?: () => void
+}
+
+export type NotificationPayload = {
+  key: string
+  message: Notification
+  when: number
 }

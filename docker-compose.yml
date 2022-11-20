@@ -14,10 +14,12 @@ services:
       - NUXT_PUBLIC_PROXY_URL=https://proxy.movie-shelf.${DOMAIN}/
       - NUXT_PUBLIC_WORKER_URL=https://worker.movie-shelf.${DOMAIN}/
       - NITRO_WORKER_PROXY_URL=http://localhost:3001/
-      - NITRO_TMDB_API_KEY=
-      - NITRO_PROWLARR_URL=
-      - NITRO_PROWLARR_API_KEY=
-      - NITRO_WORKER_REMOTE_FOLDER_URL=
+      - NITRO_WORKER_REMOTE_FOLDER_URL=${NITRO_WORKER_REMOTE_FOLDER_URL}
+      - NITRO_TMDB_API_KEY=${NITRO_TMDB_API_KEY}
+      - NITRO_PROWLARR_API_KEY=${NITRO_PROWLARR_API_KEY}
+      - NITRO_PROWLARR_URL=${NITRO_PROWLARR_URL}
+      - NITRO_TMDB_LANG=${NITRO_TMDB_LANG}
+      - NUXT_PUBLIC_RATING_COUNTRIES=${NUXT_PUBLIC_RATING_COUNTRIES}
     volumes:
       - '/opt/movie-shelf:/data'
       - '/etc/localtime:/etc/localtime:ro'

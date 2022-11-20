@@ -40,6 +40,11 @@ html, body , #__nuxt{
   background: #111;
   color: white;
   color-scheme: dark;
+  -webkit-tap-highlight-color: #dc004366;
+}
+
+::selection {
+  --at-apply: bg-primary/65;
 }
 
 </style>

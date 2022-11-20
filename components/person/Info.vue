@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Person } from '~/types'
 import { formatDate } from '~/composables/utils'
-import { TMDB_IMAGE_BASE_THUMBNAIL } from '~/constants/images'
 
 const { item } = defineProps<{
   item: Person

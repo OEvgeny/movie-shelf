@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { Media, MediaType } from '~/types'
 import { formatDate, formatLang, formatTime, numberWithCommas } from '~/composables/utils'
-import { TMDB_IMAGE_BASE_THUMBNAIL } from '~/constants/images'
 
 const { item } = defineProps<{
   item: Media
@@ -33,6 +32,14 @@ const directors = $computed(() => item.credits?.crew.filter(person => person.job
 
       <div text-sm op80>
         <ul grid="~ cols-[max-content_1fr] lg:cols-[max-content_1fr_max-content_1fr] gap3" items-center>
+          <template v-if="item.original_title">
+            <div>
+              Original Title
+            </div>
+            <div>
+              {{ item.original_title }}
+            </div>
+          </template>
           <template v-if="item.release_date">
             <div>
               Released

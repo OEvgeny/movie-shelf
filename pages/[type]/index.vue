@@ -32,12 +32,8 @@ const AsyncWrapper = defineComponent(async (_, ctx) => {
 
 <template>
   <div>
-    <AsyncWrapper>
-      <template #default="{ item }">
-        <NuxtLink :to="`/${type}/${item.id}`">
-          <MediaHero :item="item" :type="type" />
-        </NuxtLink>
-      </template>
+    <AsyncWrapper #default="{ item }">
+      <MediaHero :item="item" :type="type" :to="`/${type}/${item.id}`" />
     </AsyncWrapper>
     <CarouselAutoQuery
       v-for="query of queries"

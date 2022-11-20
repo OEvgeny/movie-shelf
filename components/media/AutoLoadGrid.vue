@@ -64,8 +64,8 @@ else {
       </template>
     </MediaGrid>
     <div ref="tailEl" />
-    <div v-if="isLoading" p10 animate-pulse>
-      <div i-carbon:circle-dash text-4xl ma animate-spin />
+    <div v-if="isLoading" flex items-center justify-center p10>
+      <Loader />
     </div>
   </div>
 </template>

@@ -20,8 +20,9 @@ type SearchResult = {
   saved?: boolean
 }
 
-const { query } = defineProps<{
+const { query, showAdult = false } = defineProps<{
   query?: string
+  showAdult: boolean
 }>()
 
 let count = $ref<undefined | number>()
@@ -40,11 +41,15 @@ const getSortPredicate = (field: 'size' | 'seeders') => (a: SearchResult, b: Sea
     : 0
 }
 
-async function fetch(page: number) {
+async function fetch() {
   if (!currentSearch)
     return
-  const data = await searchProwlarr(currentSearch)
-  count = data.length ?? count
+  let data = await searchProwlarr(currentSearch)
+  if (!showAdult) {
+    data = data
+      .filter(item => !getCategories(item.categories).toLowerCase().includes('xxx'))
+  }
+  count = data.length
   data
     .sort(getSortPredicate('size'))
     .sort(getSortPredicate('seeders'))
@@ -57,7 +62,7 @@ function search() {
   currentSearch = input
   count = undefined
   items = []
-  fetch(1)
+  fetch()
 }
 
 const throttledSearch = useDebounceFn(search, 500)
@@ -111,7 +116,7 @@ function getCategories (categories: SearchResultCategory[]) {
 </script>
 
 <template>
-  <div flex="~ col" px16 py8 gap6>
+  <div flex="~ col" px4 md:px16 py8 gap6>
     <div flex bg-gray:10 items-center px6 py4 gap3 sticky>
       <div i-ph:magnifying-glass text-xl op50 />
       <input
@@ -122,36 +127,49 @@ function getCategories (categories: SearchResultCategory[]) {
         @keyup.enter="search"
       >
     </div>
-    <div overflow-y-auto>
-      <table class="table zebra" v-if="items.length" tex-center w-full overflow-hidden>
-        <thead>
-          <th>Title</th>
-          <th>Age</th>
-          <th>Source</th>
-          <th>Category</th>
-          <th>Size</th>
-          <th>Peers</th>
-          <th></th>
-        </thead>
-        <tbody>
-          <tr text-center v-for="item of items" :class="{ 'opacity-50': item.seeders === 0 }">
-            <td text-left min-w-80 max-w-100><a :href="item.infoUrl" n-link target="_blank" rel="nofollow,noopener">{{ item.title }}</a></td>
-            <td>{{ item.age }} days</td>
-            <td>{{ item.indexer }}</td>
-            <td>{{ getCategories(item.categories) }}</td>
-            <td>{{ humanFileSize(item.size) }}</td>
-            <td>{{ item.seeders }} / {{ item.leechers }}</td>
-            <td>
-              <button v-if="!item.saved" n-link @click="save(item)">
-                <div i-ph-cloud-arrow-up />
-              </button>
-              <div v-else-if="item.saving" inline-block animate-spin i-ph-spinner />
-              <div v-else inline-block text-lime i-ph-cloud-check />
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+    <template v-if="count === undefined">
+      <div flex items-center justify-center p10>
+        <Loader />
+      </div>
+    </template>
+    <template v-else>
+      <div>
+        <div text-2xl>Search result for: {{ currentSearch }}</div>
+        <div v-if="count != null" op50>
+          {{ count }} items
+        </div>
+      </div>
+      <div overflow-y-auto>
+        <table class="table zebra" v-if="items.length" tex-center w-full overflow-hidden>
+          <thead>
+            <th>Title</th>
+            <th>Age</th>
+            <th>Source</th>
+            <th>Category</th>
+            <th>Size</th>
+            <th>Peers</th>
+            <th></th>
+          </thead>
+          <tbody>
+            <tr text-center v-for="item of items" :class="{ 'opacity-50': item.seeders === 0 }">
+              <td text-left min-w-80 max-w-100><a :href="item.infoUrl" n-link target="_blank" rel="nofollow,noopener">{{ item.title }}</a></td>
+              <td>{{ item.age }} days</td>
+              <td>{{ item.indexer }}</td>
+              <td>{{ getCategories(item.categories) }}</td>
+              <td>{{ humanFileSize(item.size) }}</td>
+              <td>{{ item.seeders }} / {{ item.leechers }}</td>
+              <td>
+                <button v-if="!item.saved" n-link @click="save(item)">
+                  <div i-ph-cloud-arrow-up />
+                </button>
+                <div v-else-if="item.saving" inline-block animate-spin i-ph-spinner />
+                <div v-else inline-block text-lime i-ph-cloud-check />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </template>
   </div>
 </template>
 

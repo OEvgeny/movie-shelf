@@ -1,5 +1,5 @@
 import { useSingleton } from './utils'
-import type { File, FileTMDBMedia, Image, Media, Video } from '~/types'
+import type { File, FileTMDBMedia, Image, Media, MediaType, Video } from '~/types'
 
 export function getTrailer(item: Media) {
   const trailer = item.videos?.results?.find(video => video.type === 'Trailer')
@@ -27,7 +27,26 @@ const [
   useImportModal,
 ] = useSingleton<(suggestions: FileTMDBMedia[], entry: File) => void>()
 
+const [
+  provideEditModal,
+  useEditModal,
+] = useSingleton<(entry: Media, type: MediaType) => void>()
 
+const [
+  provideNotificationsState,
+  useNotifications,
+] = useSingleton<typeof notifications>()
+
+const notifications = createNotificationsService()
+
+
+const provideNotifications = (paneState: typeof notifications['pane']) => {
+  notifications.pane = paneState
+  provideNotificationsState(notifications)
+  return notifications
+}
+
+export const { notify, dismiss, dismissAll } = notifications
 
 export {
   useIframeModal,
@@ -36,4 +55,8 @@ export {
   provideImageModal,
   provideImportModal,
   useImportModal,
+  provideEditModal,
+  useEditModal,
+  provideNotifications,
+  useNotifications,
 }

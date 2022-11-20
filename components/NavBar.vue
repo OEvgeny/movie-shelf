@@ -5,6 +5,7 @@
     py5 lg:px5
     border="t lg:r base"
     bg-black
+    z10
   >
     <RouterLink v-slot="{ isActive }" to="/" title="Home">
       <div
@@ -36,5 +37,7 @@
         :class="isActive ? 'i-ph-magnifying-glass-fill text-primary' : 'i-ph-magnifying-glass'"
       />
     </RouterLink>
+    <div display-none lg:display-block></div>
+    <NotificationIcon />
   </div>
 </template>

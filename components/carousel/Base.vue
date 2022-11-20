@@ -24,11 +24,11 @@ function scrollRight() {
     <slot name="more" />
   </div>
   <div relative>
-    <div class="content" ref="scrollEl" overflow-y-auto>
+    <ScrollArea class="content" ref="scrollEl" overflow-y-auto>
       <div flex gap-2 w-max p-2 px-10>
         <slot />
       </div>
-    </div>
+    </ScrollArea>
     <button
       flex="~ col" absolute top-0 left-0 bottom-0 bg-black:50 p3 items-center justify-center op0 hover:op100 transition
       title="Scroll left"
@@ -56,14 +56,5 @@ function scrollRight() {
 .content:deep(a) {
   scroll-snap-align: center;
 }
-
-::-webkit-scrollbar {
-  height: 6px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.1);
-}
-
 
 </style>

@@ -52,15 +52,12 @@ const handleTabSwitch = (type = '') => {
   })
 }
 
-await initConnection()
 </script>
 
 <template>
-  <div>
+  <div min-h-screen>
     <AsyncWrapper v-if="firstMovie?.id" :id="firstMovie.id" #default="{ item }">
-      <NuxtLink :to="`/movie/${item.id}`">
-        <MediaHero :item="item" type="movie" />
-      </NuxtLink>
+      <MediaHero :item="item" type="movie" :to="`/movie/${item.id}`" />
     </AsyncWrapper>
     <template
       v-for="query of queries"

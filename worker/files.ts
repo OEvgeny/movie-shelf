@@ -17,14 +17,14 @@ const constructFileUpdater = () => {
 
   const emitter = new EventEmitter()
 
-  const writeEvent = (res: ServerResponse, event: string, data?: any, delay = 60000) => {
+  const writeEvent = (res: ServerResponse, event: string, data: any = '', delay = 60000) => {
     if (!res.writable) {
       res.emit('close')
       return
     }
     res.write(`event: ${event}\n`)
     delay && res.write(`retry: ${delay}\n`)
-    data && res.write(`data: ${JSON.stringify(data)}\n`)
+    res.write(`data: ${JSON.stringify(data)}\n`)
     res.write('\n')
   };
 
@@ -79,14 +79,17 @@ const constructFileUpdater = () => {
 
     const sendFile = (file: unknown) => writeEvent(res, 'file', file)
     const sendFiles = (files: unknown) => writeEvent(res, 'files', files)
+    const sendScanComplete = () => writeEvent(res, 'scan-complete')
 
     const setupConnection = () => {
       emitter.on('file', sendFile)
       emitter.on('files', sendFiles)
+      emitter.on('done', sendScanComplete)
 
       const teardown = () => {
         emitter.off('file', sendFile)
         emitter.off('files', sendFiles)
+        emitter.off('done', sendScanComplete)
         res.end()
       }
 
@@ -135,7 +138,6 @@ const constructFileUpdater = () => {
   const updateFile = (currentFile: File | undefined, fileParts: Partial<File>) => {
     if (!currentFile) return
     Object.assign(currentFile, fileParts)
-    currentFile.state.isUpdated = true 
     emitter.emit('file', currentFile)
     if (storedFiles.includes(currentFile))
       setFiles(storedFiles)
